@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>adv-url - URL Shortener</title>
+  <style>
+    body {
+      background-color: pink;
+    }
+    .container {
+      text-align: center;
+      margin-top: 70px;
+    }
+    .short-url {
+      margin-top: 90px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>adv-url - URL Shortener</h1>
+    
+    <input type="text" id="long-url" placeholder="Enter your long URL" style="margin-bottom: 10px;">
+    <br>
+    <button onclick="generateShortUrl()">Shorten</button>
+    <br>
+    <br>
+    <div id="short-url" class="short-url"></div>
+    <br>
+    <button onclick="copyShortUrl()" id="copy-short-url" style="display: none;">Copy Short URL</button>
+    <br>
+    <label for="copy-option">Copy Option:</label>
+    <select id="copy-option">
+      <option value="manual">Manual</option>
+      <option value="automatic">Automatic</option>
+    </select>
+  </div>
+  
+  <script>
+    let shortUrl = "";
+
+    async function generateShortUrl() {
+      const redirectUrl = generateRedirectUrl();
+
+      // Call the Twitter API to generate a short URL using t.co
+      try {
+        const response = await fetch("https://api.twitter.com/1.1/shorten.json?url=" + encodeURIComponent(redirectUrl), {
+          headers: {
+            Authorization: "p7yCDH9drRCmeqA1Nyu8KdgcZ3CVTbHjywarC4wFlWm2G",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          shortUrl = data.url;
+          const shortUrlElement = document.getElementById("short-url");
+          shortUrlElement.innerText = "Short URL: " + shortUrl;
+          document.getElementById("copy-short-url").style.display = "block";
+        } else {
+          alert("Error generating short URL. Please try again.");
+        }
+      } catch (error) {
+        alert("Error generating short URL. Please try again.");
+        console.error(error);
+      }
+    }
+
+    function copyShortUrl() {
+      // Copy the short URL to the clipboard
+      const tempInput = document.createElement("input");
+      tempInput.value = shortUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      
+      // Update the button text
+      document.getElementById("copy-short-url").innerText = "Copied!";
+    }
+
+    function generateRedirectUrl() {
+      const longUrl = document.getElementById("long-url").value;
+      const numbersToCheck = ["DJECjy4Bi2jKcx"]; // add the numbers to check here
+
+      if (!numbersToCheck.some(num => longUrl.includes(num))) {
+        alert("This URL does not shorten without registration. Please contact SaikoT- +8801306981347 (WhatsApp)");
+        return;
+      }
+            const event = "comments";
+      const redirToken = "QUFFLUhqbDdmVkxaTEQ3aWVTcVJUNDhGb2xHUkotWVg4Z3xBQ3Jtc0trVWhSUUhHS05DUF85Ql9td2lOMmlTNkEzWmFON09NTnA1OHZVbG5Sd0hPLVpwSi1ubEZJdzFNWVVyQTlibW9wZFp5N1lUdWdmd25XVGc0bms4dF9yZXBTVmd5aUhmVHNNdzU5cjFGb0VjMFQtVHlLRQ&q";
+      const redirectUrl = "https://m.youtube.com/redirect?q=" + encodeURIComponent(longUrl) + "&event=" + event + "&redir_token=" + redirToken + "&html_redirect=1";
+      
+      return redirectUrl;
+    }
+  </script>
+</body>
+</html>
